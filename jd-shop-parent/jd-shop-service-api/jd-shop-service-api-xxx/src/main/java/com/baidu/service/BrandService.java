@@ -1,7 +1,7 @@
 package com.baidu.service;
 
-import com.baidu.base.Result;
 import com.baidu.dto.BrandDTO;
+import com.baidu.base.Result;
 import com.baidu.group.MingruiOperation;
 import com.baidu.entity.BrandEntity;
 import com.github.pagehelper.PageInfo;

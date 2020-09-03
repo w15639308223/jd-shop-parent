@@ -1,10 +1,10 @@
 package com.baidu.service.impl;
 
-import com.baidu.base.Result;
 import com.baidu.dto.BrandDTO;
+import com.baidu.service.BrandService;
+import com.baidu.base.Result;
 import com.baidu.entity.CategoryBrandEntity;
 import com.baidu.mapper.BrandMapper;
-import com.baidu.service.BrandService;
 import com.baidu.base.BaseApiService;
 import com.baidu.entity.BrandEntity;
 import com.baidu.mapper.CategoryBrandMapper;

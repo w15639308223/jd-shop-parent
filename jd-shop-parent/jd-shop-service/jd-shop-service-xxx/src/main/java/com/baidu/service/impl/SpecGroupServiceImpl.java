@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.base.BaseApiService;
 import com.baidu.base.Result;
 import com.baidu.dto.SpecGroupDTO;
+import com.baidu.dto.SpecParamDTO;
 import com.baidu.entity.SpecGroupEntity;
+import com.baidu.entity.SpecParamEntity;
 import com.baidu.mapper.SpecGroupMapper;
+import com.baidu.mapper.SpecParamMapper;
 import com.baidu.service.SpecGroupService;
-import com.baidu.utils.BaiduBeanUtil;
 import com.baidu.utils.ObjectUtil;
+import com.baidu.utils.BaiduBeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +30,9 @@ public class SpecGroupServiceImpl extends BaseApiService implements SpecGroupSer
 
     @Autowired
     private SpecGroupMapper specGroupMapper;
+
+    @Autowired
+    private SpecParamMapper specParamMapper;
 
     @Transactional
     @Override
@@ -59,6 +65,43 @@ public class SpecGroupServiceImpl extends BaseApiService implements SpecGroupSer
     @Override
     public Result<JSONObject> delSpecGroupInfo(Integer id) {
         specGroupMapper.deleteByPrimaryKey(id);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<SpecParamEntity> getSpecParamInfo(SpecParamDTO specParamDTO) {
+
+        if (ObjectUtil.isNull(specParamDTO.getGroupId())) return this.setResultSuccess("规格组id不能为空");
+
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId",specParamDTO.getGroupId());
+        List<SpecParamEntity> list = specParamMapper.selectByExample(example);
+
+        return this.setResultSuccess(list);
+    }
+
+    @Transactional
+    @Override
+    public Result<JSONObject> saveSpecParam(SpecParamDTO specParamDTO) {
+        specParamMapper.insertSelective(BaiduBeanUtil.copyProperties(specParamDTO,SpecParamEntity.class));
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JSONObject> editSpecParam(SpecParamDTO specParamDTO) {
+        specParamMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(specParamDTO,SpecParamEntity.class));
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JSONObject> delSpecParam(Integer id) {
+        if (ObjectUtil.isNOtNull(id)){
+
+            specParamMapper.deleteByPrimaryKey(id);
+        }
         return this.setResultSuccess();
     }
 }
