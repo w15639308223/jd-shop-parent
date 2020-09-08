@@ -37,7 +37,6 @@ public class SpecGroupServiceImpl extends BaseApiService implements SpecGroupSer
     @Transactional
     @Override
     public Result<List<SpecGroupEntity>> getSpecGroupInfo(SpecGroupDTO specGroupDTO) {
-
         //通过分类id查询数据
         Example example = new Example(SpecGroupEntity.class);
         if (ObjectUtil.isNOtNull(specGroupDTO.getId()))

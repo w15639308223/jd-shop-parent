@@ -3,7 +3,9 @@ package com.baidu.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.base.BaseApiService;
 import com.baidu.base.Result;
+import com.baidu.entity.CategoryBrandEntity;
 import com.baidu.entity.CategoryEntity;
+import com.baidu.mapper.CategoryBrandMapper;
 import com.baidu.mapper.CategoryMapper;
 import com.baidu.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private CategoryBrandMapper categoryBrandMapper;
 
     //商品分类查询
     @Override
@@ -77,6 +82,15 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         if (categoryEntity.getIsParent() == 1) {
             return  this.setResultError("当前是父节点,不能删除");
         }
+
+        //通过分类id查询关系表中和品牌的关系
+        Example example1 = new Example(CategoryBrandEntity.class);
+        example1.createCriteria().andEqualTo("categoryId",id);
+        List<CategoryBrandEntity> list1 = categoryBrandMapper.selectByExample(example1);
+        if (list1.size() >= 1) {
+            return this.setResultError("不能删除,因为绑定了其他商品品牌");
+        }
+
         //构建条件查询 通过当前被删除节点的parentid查询数据
         Example example = new Example(CategoryEntity.class);
         example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());

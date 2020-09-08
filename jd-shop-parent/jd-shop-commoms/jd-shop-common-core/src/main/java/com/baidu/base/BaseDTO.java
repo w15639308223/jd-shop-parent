@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 @Api(value = "BaseDto用于数据传输,其他dto需要继承此类")
 public class BaseDTO {
 
-
     @ApiModelProperty(value = "当前页",example = "1")
     private  Integer page;
 

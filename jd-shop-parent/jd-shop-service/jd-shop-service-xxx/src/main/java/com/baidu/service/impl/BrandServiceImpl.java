@@ -1,24 +1,25 @@
 package com.baidu.service.impl;
 
-import com.baidu.dto.BrandDTO;
-import com.baidu.service.BrandService;
+import com.baidu.base.BaseApiService;
 import com.baidu.base.Result;
+import com.baidu.dto.BrandDTO;
+import com.baidu.entity.BrandEntity;
 import com.baidu.entity.CategoryBrandEntity;
 import com.baidu.mapper.BrandMapper;
-import com.baidu.base.BaseApiService;
-import com.baidu.entity.BrandEntity;
 import com.baidu.mapper.CategoryBrandMapper;
+import com.baidu.service.BrandService;
 import com.baidu.utils.BaiduBeanUtil;
+import com.baidu.utils.ObjectUtil;
 import com.baidu.utils.PinyinUtil;
 import com.baidu.utils.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.gson.JsonObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,10 +33,10 @@ import java.util.stream.Collectors;
 @RestController
 public class BrandServiceImpl extends BaseApiService implements BrandService {
 
-    @Autowired
+    @Resource
     private BrandMapper brandMapper;
 
-    @Autowired
+    @Resource
     private CategoryBrandMapper categoryBrandMapper;
 
     @Transactional
@@ -43,16 +44,19 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     public Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO) {
 
         //分页
-        PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
+        if (ObjectUtil.isNOtNull(brandDTO.getPage()) && ObjectUtil.isNOtNull(brandDTO.getRows()))
+            PageHelper.startPage(brandDTO.getPage(),brandDTO.getRows());
 
         //排序 & 条件查询
         Example example = new Example(BrandEntity.class);
         if (StringUtil.isNotEmpty(brandDTO.getSort())) example.setOrderByClause(brandDTO.getOrderByClause());
+
+        Example.Criteria criteria = example.createCriteria();
+        if (ObjectUtil.isNOtNull(brandDTO.getId()))
+            criteria.andEqualTo("id",brandDTO.getId());
+
         //模糊查询
-      /*  Example.Criteria criteria = example.createCriteria();
-        if (StringUtil.isNotEmpty(brandDTO.getName()))
-            criteria.andLike("name","&"+brandDTO.getName()+"&");*/
-        if (StringUtil.isNotEmpty(brandDTO.getName())) example.createCriteria()
+        if (StringUtil.isNotEmpty(brandDTO.getName())) criteria
                 .andLike("name","%" + brandDTO.getName() + "%");
 
         //查询
@@ -108,6 +112,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         //获得品牌数据
         BrandEntity brandEntity = BaiduBeanUtil.copyProperties(brandDTO, BrandEntity.class);
 
+        //将汉字should字母修改为大写
         brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().charAt(0))
                 ,PinyinUtil.TO_FIRST_CHAR_PINYIN).charAt(0));
         //执行修改
