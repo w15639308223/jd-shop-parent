@@ -8,10 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="jd-shop-basics-upload-server" />
         <module name="jd-shop-common-core" />
+        <module name="jd-shop-service-search" />
         <module name="jd-shop-eureka-server" />
-        <module name="jd-shop-service-api-xxx" />
-        <module name="jd-shop-basics-zuul-server" />
         <module name="jd-shop-service-xxx" />
+        <module name="jd-shop-service-api-xxx" />
+        <module name="jd-shop-service-api-search" />
+        <module name="jd-shop-basics-zuul-server" />
       </profile>
     </annotationProcessing>
   </component>
@@ -25,7 +27,9 @@
       <module name="jd-shop-eureka-server" options="-parameters" />
       <module name="jd-shop-service" options="" />
       <module name="jd-shop-service-api" options="-parameters" />
+      <module name="jd-shop-service-api-search" options="-parameters" />
       <module name="jd-shop-service-api-xxx" options="-parameters" />
+      <module name="jd-shop-service-search" options="-parameters" />
       <module name="jd-shop-service-xxx" options="-parameters" />
     </option>
   </component>

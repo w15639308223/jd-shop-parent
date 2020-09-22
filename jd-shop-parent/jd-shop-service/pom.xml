@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>jd-shop-service-xxx</module>
+        <module>jd-shop-service-search</module>
     </modules>
 
     <dependencies>
