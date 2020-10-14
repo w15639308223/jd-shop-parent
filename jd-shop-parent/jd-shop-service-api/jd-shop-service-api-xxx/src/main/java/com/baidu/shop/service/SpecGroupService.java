@@ -24,7 +24,7 @@ public interface SpecGroupService {
 
      @ApiOperation(value = "通过分类条件查询规格组")
      @GetMapping(value = "specGroup/getSpecGroupInfo")
-     Result<List<SpecGroupEntity>> getSpecGroupInfo(SpecGroupDTO specGroupDTO);
+     Result<List<SpecGroupEntity>> getSpecGroupInfo(@SpringQueryMap SpecGroupDTO specGroupDTO);
 
      @ApiOperation(value = "新增规格组")
      @PostMapping(value = "specGroup/save")
@@ -53,4 +53,6 @@ public interface SpecGroupService {
      @ApiOperation(value = "增加规格参数")
      @DeleteMapping(value = "specparam/delSpecParam")
      Result<JSONObject> delSpecParam(Integer id);
+
+
 }

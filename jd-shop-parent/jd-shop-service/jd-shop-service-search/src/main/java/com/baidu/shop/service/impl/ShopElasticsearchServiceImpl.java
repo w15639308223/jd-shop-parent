@@ -24,6 +24,8 @@ import com.baidu.shop.utils.JSONUtil;
 import com.baidu.shop.utils.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.math.NumberUtils;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -59,11 +61,11 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
-    private List<GoodsDoc> esGoodsInfo() {
+    private List<GoodsDoc> esGoodsInfo(SpuDTO spuDTO) {
         //查询出来的数据是多个spu
         List<GoodsDoc> goodsDocs = new ArrayList<>();
         //查询spu信息
-        SpuDTO spuDTO = new SpuDTO();
+        // SpuDTO spuDTO = new SpuDTO();
         Result<List<SpuDTO>> spuInfo = goodsFeign.getSpuInfo(spuDTO);
         if(spuInfo.getCode() == HttpStatus.OK){
 
@@ -226,7 +228,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         }
 
         //批量新增数据
-        List<GoodsDoc> goodsDocs = this.esGoodsInfo();
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(new SpuDTO());
         elasticsearchRestTemplate.save(goodsDocs);
 
         return this.setResultSuccess();
@@ -244,12 +246,12 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     }
 
    @Override
-    public GoodsResponse search(String search,Integer page) {
+    public GoodsResponse search(String search,Integer page,String filter) {
 
         //判断
         if (StringUtil.isEmpty(search))throw new RuntimeException("搜索的内容不能为空");
 
-        SearchHits<GoodsDoc> hits = elasticsearchRestTemplate.search(this.getSearchQueryBuilder(search,page).build(), GoodsDoc.class);
+        SearchHits<GoodsDoc> hits = elasticsearchRestTemplate.search(this.getSearchQueryBuilder(search,page,filter).build(), GoodsDoc.class);
         //得到的高亮字段放到content中
         List<SearchHit<GoodsDoc>> highLightHit = EsHighLightUtil.getHighLightHit(hits.getSearchHits());
         //遍历得到新的高亮字段
@@ -283,6 +285,26 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         GoodsResponse goodsResponse = new GoodsResponse(total, totalPage,brandList,cateList,goodsList,specParamMap);
 
         return goodsResponse;
+    }
+
+    @Override
+    public Result<JSONObject> saveData(Integer spuId) {
+        SpuDTO spuDTO = new SpuDTO();
+        spuDTO.setId(spuId);
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(spuDTO);
+        elasticsearchRestTemplate.save( goodsDocs.get(0));
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<JSONObject> delData(Integer spuId) {
+
+        GoodsDoc goodsDoc = new GoodsDoc();
+        goodsDoc.setId(spuId.longValue());
+
+        elasticsearchRestTemplate.delete(goodsDoc);
+        return this.setResultSuccess();
     }
 
     /**
@@ -330,9 +352,29 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
      * @param page
      * @return
      */
-    private  NativeSearchQueryBuilder getSearchQueryBuilder(String search, Integer page){
+    private  NativeSearchQueryBuilder getSearchQueryBuilder(String search, Integer page,String filter){
         //设置高级查询
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+
+        //System.out.println(filter);
+
+        if (StringUtil.isNotEmpty(filter) && filter.length() >2){
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+            Map<String, String> filterMap = JSONUtil.toMapValueString(filter);
+
+            filterMap.forEach((key,value) ->{
+                MatchQueryBuilder matchQueryBuilder  = null;
+                //分类 品牌 规格参数 查询的方式不一样
+                if(key.equals("cid3") || key.equals("brandId")){
+                   matchQueryBuilder  = QueryBuilders.matchQuery(key, value);
+                }else{
+                   matchQueryBuilder  = QueryBuilders.matchQuery("specs." + key + ".keyword", value);
+                }
+                boolQueryBuilder.must(matchQueryBuilder);
+            });
+            queryBuilder.withFilter(boolQueryBuilder);
+        }
+
         //查询多个字段
         queryBuilder.withQuery(QueryBuilders.multiMatchQuery(search,"title","brandName","categoryName"));
         //聚合

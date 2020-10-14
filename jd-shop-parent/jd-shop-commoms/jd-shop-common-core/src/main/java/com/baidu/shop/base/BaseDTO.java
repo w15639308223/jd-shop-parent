@@ -33,4 +33,6 @@ public class BaseDTO {
         if(!StringUtils.isEmpty(sort))return sort + " " + (desc?"desc":"");
         return null;
     }
+
+
 }

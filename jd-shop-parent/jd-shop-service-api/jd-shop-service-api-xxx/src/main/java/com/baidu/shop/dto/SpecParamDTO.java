@@ -48,4 +48,5 @@ public class SpecParamDTO extends BaseDTO {
 
     @ApiModelProperty(value = "数值类型参数，如果需要搜索，则添加分段间隔值，如CPU频率间隔：0.5-1.0")
     private String segments;
+
 }

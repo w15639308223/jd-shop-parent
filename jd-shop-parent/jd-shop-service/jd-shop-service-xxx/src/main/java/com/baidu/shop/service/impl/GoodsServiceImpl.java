@@ -2,6 +2,8 @@ package com.baidu.shop.service.impl;
 
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.component.MrRabbitMQ;
+import com.baidu.shop.constant.MqMessageConstant;
 import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
@@ -53,6 +55,9 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private StockMapper stockMapper;
 
+    @Resource
+    private MrRabbitMQ rabbitMQ;
+
     @Transactional
     @Override
     public Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
@@ -68,6 +73,9 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
             criteria.andLike("title","%"+spuDTO.getTitle()+"%");
         if (ObjectUtil.isNOtNull(spuDTO.getSaleable()) && spuDTO.getSaleable() !=2)
             criteria.andEqualTo("saleable",spuDTO.getSaleable());
+        if (ObjectUtil.isNOtNull(spuDTO.getId())){
+            criteria.andEqualTo("id",spuDTO.getId());
+        }
         //排序
         if (ObjectUtil.isNOtNull(spuDTO.getSort())) {
             example.setOrderByClause(spuDTO.getOrderByClause());
@@ -137,10 +145,19 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         return this.setResult(HttpStatus.OK,pageInfo.getTotal() + "",spuDtoList);
     }
 
-    @Transactional
+    //@Transactional
     @Override
     public Result<JsonObject> saveGoods(SpuDTO spuDTO) {
 
+        Integer spuId = this.saveGoodsInfo(spuDTO);
+
+        rabbitMQ.send(spuId + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
+        return this.setResultSuccess();
+    }
+
+    //这样就解决了transasction等到方法结束了才提交事务的问题
+    @Transactional
+    public Integer saveGoodsInfo(SpuDTO spuDTO){
         Date date = new Date();
 
         SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
@@ -158,10 +175,9 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         spuDetailEntity.setSpuId(spuId);
         spuDetailMapper.insertSelective(spuDetailEntity);
 
-       //封装后的新增
+        //封装后的新增
         this.addSkuAndStock(spuDTO.getSkus(),spuId,date);
-
-        return this.setResultSuccess();
+        return  spuEntity.getId();
     }
 
     @Transactional

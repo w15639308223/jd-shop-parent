@@ -16,6 +16,8 @@
     <modules>
         <module>jd-shop-service-api-xxx</module>
         <module>jd-shop-service-api-search</module>
+        <module>jd-shop-service-api-template</module>
+        <module>jd-shop-service-api-user</module>
     </modules>
 
     <dependencies>
