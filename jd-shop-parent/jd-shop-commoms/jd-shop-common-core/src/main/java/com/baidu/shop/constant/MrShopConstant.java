@@ -8,5 +8,8 @@ package com.baidu.shop.constant;
  */
 public class MrShopConstant {
 
-    public static final  String USER_PHONE_CODE_PRE = "user_phone_code_";
+    public static final String USER_PHONE_CODE_PRE = "user_phone_code_";
+
+    public static final String USER_GOODS_CAR_PRE = "user_good_car";
+
 }

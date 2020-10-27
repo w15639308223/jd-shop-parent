@@ -17,5 +17,6 @@
         <module>jd-shop-eureka-server</module>
         <module>jd-shop-basics-zuul-server</module>
         <module>jd-shop-basics-upload-server</module>
+        <module>jd-shop-basic-user-oauth</module>
     </modules>
 </project>

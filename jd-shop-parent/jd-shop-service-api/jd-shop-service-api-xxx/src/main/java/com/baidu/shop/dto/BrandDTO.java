@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
  */
 @ApiModel(value = "品牌")
 @Data
-
 public class BrandDTO extends BaseDTO {
 
         @ApiModelProperty(value = "品牌主键",example = "1")

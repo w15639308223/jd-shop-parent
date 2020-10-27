@@ -12,9 +12,10 @@ public class HttpStatus {
 
     public static final int ERROR = 500;//失败
 
-    public  static  final  int PARAMS_VALIDATE_ERROR = 5002;//参数校验失败
+    public static final int PARAMS_VALIDATE_ERROR = 5002;//参数校验失败
 
-    public  static  final  int VALID_CODE_ERROR = 5003;//参数校验失败
+    public static final int VALID_CODE_ERROR = 5003;//参数校验失败
 
+    public static final int VERITY_ERROR = 403;//参数校验失败
 
 }

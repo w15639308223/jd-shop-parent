@@ -18,6 +18,9 @@
         <module>jd-shop-service-search</module>
         <module>jd-shop-service-template</module>
         <module>jd-shop-service-user</module>
+        <module>jd-shop-service-car</module>
+        <module>jd-shop-service-order</module>
+        <module>jd-shop-service-pay</module>
     </modules>
 
     <dependencies>

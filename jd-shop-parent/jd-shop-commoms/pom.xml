@@ -15,5 +15,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>jd-shop-common-core</module>
+        <module>jd-shop-common-oauth</module>
     </modules>
 </project>

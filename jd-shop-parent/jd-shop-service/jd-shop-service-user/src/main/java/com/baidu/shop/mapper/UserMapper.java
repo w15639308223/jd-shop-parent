@@ -1,6 +1,6 @@
 package com.baidu.shop.mapper;
 
-import com.mr.shop.entity.UserEntity;
+import com.baidu.shop.entity.UserEntity;
 import tk.mybatis.mapper.common.Mapper;
 
 /**
